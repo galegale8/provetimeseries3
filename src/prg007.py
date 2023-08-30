@@ -14,8 +14,8 @@ from tqdm.autonotebook import tqdm
 np.random.seed()
 tqdm.pandas()
 
-os.makedirs("imgs/chapter_2", exist_ok=True)
-source_data = Path("data/london_smart_meters/")
+os.makedirs("../imgs/chapter_2", exist_ok=True)
+source_data = Path("../data/london_smart_meters/")
 block_data_path = source_data/"hhblock_dataset"/"hhblock_dataset"
 
 block_1 = pd.read_csv(block_data_path/"block_0.csv", parse_dates=False)
@@ -236,14 +236,14 @@ hhblock_df = hhblock_df.progress_apply(map_weather_holidays, axis=1)
 display(hhblock_df.memory_usage(deep=True))
 print(f"Total: {hhblock_df.memory_usage(deep=True).sum()/1024**2} MB")
 
-os.makedirs("data/london_smart_meters/preprocessed", exist_ok=True)
+os.makedirs("../data/london_smart_meters/preprocessed", exist_ok=True)
 
 from utils.data_utils import write_compact_to_ts
 write_compact_to_ts(hhblock_df,
         static_columns = ['LCLid', 'start_timestamp', 'frequency','series_length', 'stdorToU', 'Acorn', 'Acorn_grouped', 'file'], 
         time_varying_columns = ['energy_consumption', 'holidays', 'visibility', 'windBearing', 'temperature', 'dewPoint',
         'pressure', 'apparentTemperature', 'windSpeed', 'precipType', 'icon','humidity', 'summary'],
-        filename=f"data/london_smart_meters/preprocessed/london_smart_meters_merged.ts",
+        filename=f"../data/london_smart_meters/preprocessed/london_smart_meters_merged.ts",
         sep=";",
         chunk_size=1000)
 
