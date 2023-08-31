@@ -247,9 +247,22 @@ write_compact_to_ts(hhblock_df,
         sep=";",
         chunk_size=1000)
 
-hhblock_df[['LCLid',"file", "Acorn_grouped"]].to_pickle(f"data/london_smart_meters/preprocessed/london_smart_meters_lclid_acorn_map.pkl")
+hhblock_df[['LCLid',"file", "Acorn_grouped"]].to_pickle(f"../data/london_smart_meters/preprocessed/london_smart_meters_lclid_acorn_map.pkl")
+
+blocks = [f"block_{i}" for i in range(111)]
+
+n_chunks= 8
+split_blocks = [blocks[i:i + n_chunks] for i in range(0, len(blocks), n_chunks)] 
 
 
+for blk in tqdm(split_blocks):
+    df = hhblock_df.loc[hhblock_df.file.isin(blk)]
+    blk = [int(b.replace("block_","")) for b in blk]
+    block_str = f"block_{min(blk)}-{max(blk)}"
+    df.to_parquet(f"../data/london_smart_meters/preprocessed/london_smart_meters_merged_{block_str}.parquet")
+
+
+# %%
 
 
 
