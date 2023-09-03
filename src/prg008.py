@@ -21,14 +21,14 @@ tqdm.pandas()
 
 
 
-#os.makedirs("../imgs/chapter_2", exist_ok=True)
-os.makedirs("imgs/chapter_2", exist_ok=True)
+os.makedirs("../imgs/chapter_2", exist_ok=True)
+#os.makedirs("imgs/chapter_2", exist_ok=True)
 
 
 print(os.getcwd())
 
-#preprocessed = Path("../data/london_smart_meters/preprocessed")
-preprocessed = Path("data/london_smart_meters/preprocessed")
+preprocessed = Path("../data/london_smart_meters/preprocessed")
+#preprocessed = Path("data/london_smart_meters/preprocessed")
 print(preprocessed.is_dir())
 #assert preprocessed.is_dir(), "You have to run 02 - Preprocessing London Smart Meter Dataset.ipynb in Chapter02 before running this notebook"
 
