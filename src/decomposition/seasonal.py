@@ -448,9 +448,7 @@ class FourierDecomposition(BaseDecomposition):
     def _extract_seasonality(self, detrended, **seasonality_kwargs):
         """Extracts Seasonality from detrended data using fourier terms"""
         X = self._prepare_X(detrended, **seasonality_kwargs)
-        self.seasonality_model = RidgeCV(normalize=True, fit_intercept=False).fit(
-            X, detrended
-        )
+        self.seasonality_model = RidgeCV(normalize=True, fit_intercept=False).fit(X, detrended)
         return self.seasonality_model.predict(X)
 
 
