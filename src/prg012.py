@@ -608,6 +608,109 @@ fig.write_image("../imgs/chapter_3/stl_decomposition_zoomed.png")
 fig.show(renderer="svg")
 
 
+from feature_engineering.temporal_features import add_temporal_features
+
+
+with LogTime():
+    full_df, added_features = add_temporal_features(
+        full_df,
+        field_name="timestamp",
+        frequency="30min",
+        add_elapsed=True,
+        drop=False,
+        use_32_bit=True,
+    )
+print(f"Features Created: {','.join(added_features)}")
+
+from feature_engineering.temporal_features import (
+    add_fourier_features,
+    bulk_add_fourier_features,
+)
+
+
+with LogTime():
+    full_df, added_features = bulk_add_fourier_features(
+        full_df,
+        ["timestamp_Month", "timestamp_Hour", "timestamp_Minute"],
+        max_values=[12, 24, 60],
+        n_fourier_terms=5,
+        use_32_bit=True,
+    )
+print(f"Features Created: {','.join(added_features)}")
+
+
+
+print("FINEEEEEEEEEEEEEEEEEEEEE")
+
+
+
+full_df.info()
+full_df.LCLid.unique()
+
+full_df[full_df.LCLid=='MAC000061']
+
+plot_df = (
+    full_df[["timestamp_Month", "timestamp_Month_sin_1"]]
+    .drop_duplicates()
+    .sort_values("timestamp_Month")
+)
+
+plot_df.columns = ["calendar", "fourier"]
+
+plot_df = pd.concat([plot_df, plot_df, plot_df]).reset_index(drop=True)
+# plot_df.reset_index(drop=True, inplace=True)
+
+plot_df.reset_index(inplace=True)
+plot_df["index"] += 1
+plot_df = pd.melt(
+    plot_df, id_vars="index", var_name="month", value_name="Representation"
+)
+
+
+fig = px.line(plot_df, x="index", y="Representation", facet_row="month")
+fig.update_layout(
+    autosize=False,
+    width=900,
+    height=800,
+    title_text="Step Function vs Continuous Function",
+    title={"x": 0.5, "xanchor": "center", "yanchor": "top"},
+    titlefont={"size": 20},
+    legend_title=None,
+    # yaxis=dict(
+    #     # title_text=ylabel,
+    #     # titlefont=dict(size=12),
+    # ),
+    xaxis=dict(
+        title_text="Time",
+        # titlefont=dict(size=12),
+    ),
+)
+fig.update_yaxes(matches=None)
+fig.update_xaxes(
+    ticktext=np.arange(1, 13).tolist() * 3,
+    tickvals=np.arange(len(plot_df)) + 1,
+)
+fig.write_image(f"../imgs/chapter_6/fourier.png")
+fig.show()
+
+full_df.info(memory_usage="deep", verbose=False)
+
+
+
+full_df[full_df["type"] == "train"].drop(columns="type").to_parquet(
+    preprocessed / "selected_blocks_train_missing_imputed_feature_engg.parquet"
+)
+full_df[full_df["type"] == "val"].drop(columns="type").to_parquet(
+    preprocessed / "selected_blocks_val_missing_imputed_feature_engg.parquet"
+)
+full_df[full_df["type"] == "test"].drop(columns="type").to_parquet(
+    preprocessed / "selected_blocks_test_missing_imputed_feature_engg.parquet"
+)
+
+
+
+
+
 
 
 
