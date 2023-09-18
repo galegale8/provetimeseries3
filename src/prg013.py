@@ -112,9 +112,10 @@ print(f"Stationary: {res.adf_res.stationary} | Deterministic Trend: {res.determi
 import scipy.stats as stats
 
 
-tau, p_value = stats.kendalltau(y, np.arange(len(y)))
+
 
 y = y_trend
+tau, p_value = stats.kendalltau(y, np.arange(len(y)))
 check_trend(y, confidence=0.05)
 check_trend(y, confidence=0.05, mann_kendall=True)
 
@@ -180,17 +181,20 @@ fig = px.bar(plot_df, x="x", y="y", pattern_shape="seasonal_lag", color="seasona
 fig.show()
 
 
+from  transforms.stationary_utils import check_seasonality
+
+ris = check_seasonality(y_seasonal, max_lag=30, seasonal_period=25, confidence=0.05)
+
+from transforms.target_transformations import DeseasonalizingTransformer
+deseasonalizing_transformer = DeseasonalizingTransformer(seasonality_extraction="period_averages",seasonal_period=25)
+
+y_deseasonalized = deseasonalizing_transformer.fit_transform(y_seasonal, freq="1D")
+
+y_seasonal.plot()
+plt.show()
 
 
-
-
-
-
-
-
-
-
-
+print("FINEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
 
 y_seasonal.plot()

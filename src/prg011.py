@@ -14,7 +14,7 @@ from IPython.display import display, HTML
 # %autoreload 2
 np.random.seed()
 tqdm.pandas()
-print("FINEEEEEEEEEEEEE")
+
 
 
 
@@ -89,7 +89,7 @@ ts_df["month_name"] = ts_df.index.month_name()
 ts_df.info()
 
 
-
+print("FINEEEEEEEEEEEEE")
 
 
 
@@ -243,6 +243,64 @@ fig = decomposition_plot(ts_df.index, res.observed, res.seasonal, res.trend, res
 fig.write_image("../imgs/chapter_3/moving_avg_decomposition.png")
 fig.show(renderer="svg")
 
+fig.update_xaxes(type="date", range=["2012-11-4", "2012-12-4"])
+fig.write_image("../imgs/chapter_3/moving_avg_decomposition_zoomed.png")
+fig.show(renderer="svg")
+
+
+stl = STL(seasonality_period=7*48, model = "additive")
+res_new = stl.fit(ts_df.energy_consumption)
+
+fig = res_new.plot(interactive=True)
+fig.update_layout(
+            legend=dict(
+                font=dict(size=15),
+                orientation="h",
+                yanchor="bottom",
+                y=0.98,
+                xanchor="right",
+                x=1,
+            ),
+            yaxis=dict(
+                # title_text=ylabel,
+                titlefont=dict(size=15),
+                tickfont=dict(size=15),
+            ),
+            xaxis=dict(
+                # title_text=xlabel,
+                titlefont=dict(size=15),
+                tickfont=dict(size=15),
+            )
+        )
+fig.write_image("../imgs/chapter_3/stl_decomposition.png")
+fig.show(renderer="svg")
+
+fig.update_xaxes(type="date", range=["2012-11-4", "2012-12-4"])
+fig.write_image("../imgs/chapter_3/stl_decomposition_zoomed.png")
+fig.show(renderer="svg")
+
+from pandas.core.nanops import nanmean as pd_nanmean
+from plotly.subplots import make_subplots
+from sklearn.linear_model import RidgeCV
+from statsmodels.tools.data import _is_using_pandas
+from statsmodels.tsa.seasonal import DecomposeResult
+
+
+stl = FourierDecomposition(seasonality_period="hour", model = "additive", n_fourier_terms=5)
+res_new = stl.fit(pd.Series(ts.squeeze(), index=ts_df.index))
+
+
+ts_df.squeeze().shape
+ts_df.shape
+
+
+###################################################
+
+
+
+
+
+
 
 ts_df.info()
 ts_df.year.unique()
@@ -287,8 +345,62 @@ fig.update_xaxes(type="date", range=["2012-11-4", "2012-11-11"])
 fig.write_image("../imgs/chapter_3/stl_decomposition_zoomed.png")
 fig.show(renderer="svg")
 
+#%%
+
+from statsmodels.tsa.seasonal import seasonal_decompose
+from decomposition.seasonal import STL, FourierDecomposition, MultiSeasonalDecomposition
+
+stl = FourierDecomposition(seasonality_period="hour", model = "additive", n_fourier_terms=5)
+res_new = stl.fit(pd.Series(ts.squeeze(), index=ts_df.index))
 
 
 
 
 
+
+
+
+
+ts_df.info()
+map_df.info()
+seasonality.info()
+
+
+
+ts_df["dayofweek"] = ts_df.index.dayofweek
+ts_df["hour"] = ts_df.index.hour
+map_df = ts_df[["dayofweek","hour"]].drop_duplicates().sort_values(["dayofweek", "hour"])
+map_df["map"] = np.arange(1, len(map_df)+1)
+seasonality = ts_df.merge(map_df, on=["dayofweek","hour"], how='left', validate="many_to_one")['map']
+
+stl = MultiSeasonalDecomposition(seasonal_model="averages",seasonality_periods=[48*365, 48*7, 48], model = "additive")
+res_new = stl.fit(pd.Series(ts, index=ts_df.index))
+fig = res_new.plot(interactive=True)
+fig.update_layout(
+            legend=dict(
+                font=dict(size=15),
+                orientation="h",
+                yanchor="bottom",
+                y=0.98,
+                xanchor="right",
+                x=1,
+            ),
+            yaxis=dict(
+                # title_text=ylabel,
+                titlefont=dict(size=15),
+                tickfont=dict(size=15),
+            ),
+            xaxis=dict(
+                # title_text=xlabel,
+                titlefont=dict(size=15),
+                tickfont=dict(size=15),
+            )
+        )
+fig.write_image("../imgs/chapter_3/mstl_decomposition_averages.png")
+fig.show(renderer="svg")
+
+
+
+fig.update_xaxes(type="date", range=["2012-11-4", "2012-12-4"])
+fig.write_image("../imgs/chapter_3/mstl_decomposition_averages_zoomed.png")
+fig.show(renderer="svg")
